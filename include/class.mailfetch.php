@@ -257,6 +257,12 @@ class MailFetcher {
             if(($emailId=Email::getIdByEmail(strtolower($addr->mailbox).'@'.$addr->host)))
                 break;
 
+        $cclist = array();
+        if(is_array($headerinfo->cc))
+            foreach($headerinfo->cc as $addr)
+                $cclist[] = strtolower($addr->mailbox).'@'.$addr->host;
+
+        $header['emailcc'] = implode(", ", $cclist);
         $header['emailId'] = $emailId;
 
         // Ensure we have a message-id. If unable to read it out of the

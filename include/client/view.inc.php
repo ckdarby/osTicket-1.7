@@ -46,6 +46,10 @@ if(!$dept || !$dept->isPublic())
                    <td><?php echo Format::htmlchars($ticket->getEmail()); ?></td>
                </tr>
                <tr>
+                   <th width="100">Email CCs:</th>
+                   <td><?php echo Format::htmlchars($ticket->getEmailcc()); ?></td>
+               </tr>
+               <tr>
                    <th>Phone:</th>
                    <td><?php echo $ticket->getPhoneNumber(); ?></td>
                </tr>

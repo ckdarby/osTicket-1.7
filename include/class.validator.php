@@ -102,6 +102,10 @@ class Validator {
                 if(!$this->is_email($this->input[$k]))
                     $this->errors[$k]=$field['error'];
                 break;
+            case 'emailcc':
+                if(!$this->is_emailcc($this->input[$k]))
+                    $this->errors[$k]=$field['error'];
+                break;
             case 'url':
                 if(!$this->is_url($this->input[$k]))
                     $this->errors[$k]=$field['error'];
@@ -139,6 +143,11 @@ class Validator {
     function is_email($email) {
         return preg_match('/^([*+!.&#$|\'\\%\/0-9a-z^_`{}=?~:-]+)@(([0-9a-z-]+\.)+[0-9a-z]{2,})$/i',$email);
     }
+
+    function is_emailcc($emails) {
+        return true;
+    }
+
     function is_phone($phone) {
         /* We're not really validating the phone number but just making sure it doesn't contain illegal chars and of acceptable len */
         $stripped=preg_replace("(\(|\)|\-|\.|\+|[  ]+)","",$phone);

@@ -174,6 +174,18 @@ class Ticket {
         return $this->ht['email'];
     }
 
+    function getEmailCC() {
+        return $this->ht['emailcc'];
+    }
+
+    function getCombinedEmails() {
+        $emails = array();
+        $emails['to'] = $this->getEmail();
+        $emails['cc'] = $this->getEmailCC();
+        return implode(",", $emails);
+    }
+
+
     function getAuthToken() {
         # XXX: Support variable email address (for CCs)
         return md5($this->getId() . $this->getEmail() . SECRET_SALT);
@@ -290,6 +302,7 @@ class Ticket {
 
         $info=array('name'  =>  $this->getName(),
                     'email' =>  $this->getEmail(),
+                    'emailcc' =>  $this->getEmailCC(),
                     'phone' =>  $this->getPhone(),
                     'phone_ext' =>  $this->getPhoneExt(),
                     'subject'   =>  $this->getSubject(),
@@ -748,7 +761,7 @@ class Ticket {
             if($cfg->stripQuotedReply() && ($tag=$cfg->getReplySeparator()))
                 $msg['body'] ="\n$tag\n\n".$msg['body'];
 
-            $email->sendAutoReply($this->getEmail(), $msg['subj'],
+            $email->sendAutoReply($this->getCombinedEmails(), $msg['subj'],
                 $msg['body'], null, $options);
         }
 
@@ -817,7 +830,7 @@ class Ticket {
             $msg = $this->replaceVars($msg->asArray(),
                         array('signature' => ($dept && $dept->isPublic())?$dept->getSignature():''));
 
-            $email->sendAutoReply($this->getEmail(), $msg['subj'], $msg['body']);
+            $email->sendAutoReply($this->getCombinedEmails(), $msg['subj'], $msg['body']);
         }
 
         $client= $this->getClient();
@@ -883,7 +896,7 @@ class Ticket {
             if (!$message)
                 $message = $this->getLastMessage();
             $options = array('references' => $message->getEmailMessageId());
-            $email->sendAutoReply($this->getEmail(), $msg['subj'], $msg['body'],
+            $email->sendAutoReply($this->getCombinedEmails(), $msg['subj'], $msg['body'],
                 null, $options);
         }
     }
@@ -1400,7 +1413,7 @@ class Ticket {
 
             $attachments =($cfg->emailAttachments() && $files)?$response->getAttachments():array();
             $options = array('references' => $response->getEmailMessageId());
-            $email->sendAutoReply($this->getEmail(), $msg['subj'], $msg['body'], $attachments,
+            $email->sendAutoReply($this->getCombinedEmails(), $msg['subj'], $msg['body'], $attachments,
                 $options);
         }
 
@@ -1458,7 +1471,7 @@ class Ticket {
             $attachments = $cfg->emailAttachments()?$response->getAttachments():array();
             $options = array('references' => $response->getEmailMessageId());
             //TODO: setup  5 param (options... e.g mid trackable on replies)
-            $email->send($this->getEmail(), $msg['subj'], $msg['body'], $attachments,
+            $email->send($this->getCombinedEmails(), $msg['subj'], $msg['body'], $attachments,
                 $options);
         }
 
@@ -1618,6 +1631,7 @@ class Ticket {
         $fields=array();
         $fields['name']     = array('type'=>'string',   'required'=>1, 'error'=>'Name required');
         $fields['email']    = array('type'=>'email',    'required'=>1, 'error'=>'Valid email required');
+        $fields['emailcc']  = array('type'=>'emailcc',  'required'=>0, 'error'=>'Valid emails required');
         $fields['subject']  = array('type'=>'string',   'required'=>1, 'error'=>'Subject required');
         $fields['topicId']  = array('type'=>'int',      'required'=>1, 'error'=>'Help topic required');
         $fields['priorityId'] = array('type'=>'int',    'required'=>1, 'error'=>'Priority required');
@@ -1653,6 +1667,7 @@ class Ticket {
 
         $sql='UPDATE '.TICKET_TABLE.' SET updated=NOW() '
             .' ,email='.db_input($vars['email'])
+            .' ,emailcc='.db_input($vars['emailcc'])
             .' ,name='.db_input(Format::striptags($vars['name']))
             .' ,subject='.db_input(Format::striptags($vars['subject']))
             .' ,phone="'.db_input($vars['phone'],false).'"'
@@ -1888,6 +1903,7 @@ class Ticket {
         $fields=array();
         $fields['name']     = array('type'=>'string',   'required'=>1, 'error'=>'Name required');
         $fields['email']    = array('type'=>'email',    'required'=>1, 'error'=>'Valid email required');
+        $fields['emailcc']  = array('type'=>'emailcc',  'required'=>0, 'error'=>'Valid emails required');
         $fields['subject']  = array('type'=>'string',   'required'=>1, 'error'=>'Subject required');
         $fields['message']  = array('type'=>'text',     'required'=>1, 'error'=>'Message required');
         switch (strtolower($origin)) {
@@ -1988,6 +2004,7 @@ class Ticket {
             .' ,topic_id='.db_input($topicId)
             .' ,priority_id='.db_input($priorityId)
             .' ,email='.db_input($vars['email'])
+            .' ,emailcc='.db_input($vars['emailcc'])
             .' ,name='.db_input(Format::striptags($vars['name']))
             .' ,subject='.db_input(Format::striptags($vars['subject']))
             .' ,phone="'.db_input($vars['phone'],false).'"'
@@ -2151,7 +2168,7 @@ class Ticket {
             if (isset($response))
                 $references = array($response->getEmailMessageId(), $references);
             $options = array('references' => $references);
-            $email->send($ticket->getEmail(), $msg['subj'], $msg['body'], $attachments,
+            $email->send($ticket->getCombinedEmails(), $msg['subj'], $msg['body'], $attachments,
                 $options);
         }
 

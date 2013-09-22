@@ -43,6 +43,12 @@ $info=($_POST && $errors)?Format::htmlchars($_POST):$info;
         </td>
     </tr>
     <tr>
+        <th nowrap >Email CCs:</th>
+        <td>           
+         <input type="text" name="emailcc" size="30" value="<?php echo $info['emailcc']?>" placeholder="email@email.com, email@other.com">
+        </td>
+    </tr>
+    <tr>
         <th>Telephone:</th>
         <td>
 

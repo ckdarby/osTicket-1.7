@@ -174,6 +174,10 @@ if($ticket->isOverdue())
                     </td>
                 </tr>
                 <tr>
+                    <th>Email CCs:</th>
+                    <td><?php echo $ticket->getEmailcc(); ?></td>
+                </tr>
+                <tr>
                     <th>Phone:</th>
                     <td><?php echo $ticket->getPhoneNumber(); ?></td>
                 </tr>
