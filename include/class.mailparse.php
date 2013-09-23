@@ -336,6 +336,7 @@ class EmailDataParser {
             }
         }
 
+        $data['emailcc'] = $parser->getCcAddressList();
         $data['subject'] = $parser->getSubject();
         $data['message'] = Format::stripEmptyLines($parser->getBody());
         $data['header'] = $parser->getHeader();
