@@ -336,7 +336,13 @@ class EmailDataParser {
             }
         }
 
-        $data['emailcc'] = $parser->getCcAddressList();
+        $cclist = array();
+        $ccs = $parser->getToAddressList();
+        if(is_array($ccs))
+            foreach($ccs as $addr)
+                $cclist[] = strtolower($addr->mailbox).'@'.$addr->host;
+
+        $data['emailcc'] = implode(", ", $cclist);
         $data['subject'] = $parser->getSubject();
         $data['message'] = Format::stripEmptyLines($parser->getBody());
         $data['header'] = $parser->getHeader();
